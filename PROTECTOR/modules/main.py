@@ -125,17 +125,21 @@ async def handle_message(client, message):
         
         
 # -------------------------------------------------------------------------------------
-@app.on_edited_message(filters.group & ~filters.me)
+# Delete long edited messages but keep short messages and emoji reactions
 async def delete_long_edited_messages(client, edited_message: Message):
     # Check if the edited message contains text
     if edited_message.text:
-        # Check if the message is considered long (more than 10 words)
+        # Check if the message is considered long (more than 25 words)
         if len(edited_message.text.split()) > 25:
             await edited_message.delete()
     else:
-        # Check if the edited message contains other media types (e.g., stickers, animations)
-        if edited_message.sticker or edited_message.animation:
-            return  # Leave media messages untouched
+        # If the edited message does not contain text, check for emoji reactions
+        if edited_message.sticker or edited_message.animation or edited_message.emoji:
+            return  # Leave emoji reactions untouched
+
+@app.on_edited_message(filters.group & ~filters.me)
+async def handle_edited_messages(_, edited_message: Message):
+    await delete_long_edited_messages(_, edited_message)
 
 # ----------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------
