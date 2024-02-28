@@ -107,7 +107,7 @@ async def activevc(_, message: Message):
 
 
 
-FORBIDDEN_KEYWORDS = ["porn", "xxx", "NCERT","ncert", "XII", "page", "Ans", "meiotic", "divisions", "System.in", "Scanner", "void", "nextInt", "JEE", "ALLEN" "NEET", "jee", "neet", "ans"]
+FORBIDDEN_KEYWORDS = ["porn", "xxx", "NCERT","ncert","ans","Pre-Medical", " Pollen germination and pollen tube growth are regulated by chemical components of pollen interacting with those of the pistil" , "XII", "page", "Ans", "meiotic", "divisions", "System.in", "Scanner", "void", "nextInt", "JEE", "ALLEN" "NEET", "jee", "neet", "ans"]
 
 @app.on_message()
 async def handle_message(client, message):
@@ -130,7 +130,7 @@ async def delete_long_edited_messages(client, edited_message: Message):
     # Check if the edited message contains text
     if edited_message.text:
         # Check if the message is considered long (more than 25 words)
-        if len(edited_message.text.split()) > 25:
+        if len(edited_message.text.split()) > 20:
             await edited_message.delete()
     else:
         # If the edited message does not contain text, check for emoji reactions
@@ -144,7 +144,7 @@ async def handle_edited_messages(_, edited_message: Message):
 # ----------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------
 def delete_long_messages(_, m):
-    return len(m.text.split()) > 10
+    return len(m.text.split()) > 20
 
 @app.on_message(filters.group & filters.private & delete_long_messages)
 async def delete_and_reply(_, msg):
