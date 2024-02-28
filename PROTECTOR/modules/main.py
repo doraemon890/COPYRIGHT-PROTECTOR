@@ -150,9 +150,7 @@ async def keep_reaction_message(client, message: Message):
     if message.sticker or message.animation or message.emoji:
         return
     # If it's not a reaction message, proceed with other checks or actions
-    pass 
-
-# -------------------------------
+    pass
 
 async def delete_pdf_files(client, message):
     if message.document and message.document.mime_type == "application/pdf":
