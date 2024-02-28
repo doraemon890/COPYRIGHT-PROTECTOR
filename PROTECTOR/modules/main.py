@@ -128,8 +128,10 @@ async def handle_message(client, message):
 
 @app.on_edited_message(filters.group & ~filters.me)
 async def delete_edited_messages(client, edited_message):
-    if edited_message.text:  # Check if the edited message is a text message
+    # Check if the edited message contains text
+    if edited_message.text:
         await edited_message.delete()
+
 
 # ----------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------
