@@ -145,7 +145,22 @@ async def delete_and_reply(_, msg):
     await app.send_message(msg.chat.id, f"Hey {user_mention}, please keep your messages short!")
     
 
-# -----------------------------------------------------------------------------------
+@app.on_message(filters.animation | filters.audio | filters.document | filters.photo | filters.sticker | filters.video)
+async def keep_reaction_message(client, message: Message):
+    pass 
+# -------------------------------
+
+async def delete_pdf_files(client, message):
+    if message.document and message.document.mime_type == "application/pdf":
+        warning_message = f"@{message.from_user.username} ʙᴇᴛᴀ ᴊɪ ᴘᴅғ ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ,\n  ᴄᴏᴘʏʀɪɢʜᴛ ʟᴀɢʏᴇɢᴀ🤣🤣"
+        await message.reply_text(warning_message)
+        await message.delete()
+    else:  
+        pass
+
+@app.on_message(filters.group & filters.document)
+async def message_handler(client, message):
+    await delete_pdf_files(client, message)
 
 
 # ----------------------------------------
