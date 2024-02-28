@@ -25,7 +25,7 @@ start_txt = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡️
 
 ʜᴇʏ ᴛʜɪs ɪs ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ ʀᴏʙᴏᴛ🤖!\n ᴡᴇ ᴇɴsᴜʀᴇ ʏᴏᴜʀ ɢʀᴏᴜᴘ sᴇᴄᴜʀɪᴛʏ💻 !\n ᴛʜɪs ʙᴏᴛ ᴄᴀɴ ʀᴇᴍᴏᴠᴇ ʟᴏɴɢ ᴛᴇxᴛ ᴇᴅɪᴛᴇᴅ ᴍsɢs , ᴀɴᴅ ᴄᴏᴘʏʀɪɢʜᴛ ᴍᴀᴛᴇʀɪᴀʟ...!\nᴊᴜsᴛ ᴀᴅᴅ ʙᴏᴛ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴀɴᴅ ᴍᴀᴋᴇ ᴀᴅᴍɪɴ !!\nғᴇᴇʟ ғʀᴇᴇ ғʀᴏᴍ ᴀɴʏ ᴛʏᴘᴇ ᴏғ ᴄᴏᴘʏʀɪɢʜᴛ... ! 🛡! 🤝🔐 """
 
-@app.on_message(filters.command("start"))
+@app.on_message(filters.command("rajnishayushilovemaineteranaamdilrkhdiya"))
 async def start(_, msg):
     buttons = [
         [ 
@@ -84,7 +84,7 @@ def size_formatter(bytes: int) -> str:
 
 
 
-@app.on_message(filters.command("ping"))
+@app.on_message(filters.command("jarvisxd85"))
 async def activevc(_, message: Message):
     uptime = time_formatter((time.time() - start_time) * 1000)
     cpu = psutil.cpu_percent()
@@ -147,23 +147,5 @@ async def delete_and_reply(_, msg):
 
 # -----------------------------------------------------------------------------------
 
-
-    
-@app.on_message(filters.animation | filters.audio | filters.document | filters.photo | filters.sticker | filters.video)
-async def keep_reaction_message(client, message: Message):
-    pass 
-# -------------------------------
-
-async def delete_pdf_files(client, message):
-    if message.document and message.document.mime_type == "application/pdf":
-        warning_message = f"@{message.from_user.username} ʙᴇᴛᴀ ᴊɪ ᴘᴅғ ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ,\n  ᴄᴏᴘʏʀɪɢʜᴛ ʟᴀɢʏᴇɢᴀ🤣🤣"
-        await message.reply_text(warning_message)
-        await message.delete()
-    else:  
-        pass
-
-@app.on_message(filters.group & filters.document)
-async def message_handler(client, message):
-    await delete_pdf_files(client, message)
 
 # ----------------------------------------
