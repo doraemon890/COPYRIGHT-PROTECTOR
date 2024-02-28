@@ -125,22 +125,17 @@ async def handle_message(client, message):
         
         
 # -------------------------------------------------------------------------------------
-# Keep reaction messages (e.g., stickers, emojis) and delete others
-@app.on_message(filters.animation | filters.audio | filters.document | filters.photo | filters.sticker | filters.video)
-async def keep_reaction_message(client, message: Message):
-    # Check if the message is a reaction message (e.g., sticker, emoji) and return to keep it
-    if message.sticker or message.animation or message.emoji:
-        return
-    # If it's not a reaction message, proceed with other checks or actions
-    pass
-    
-# Delete edited messages if they contain text
 @app.on_edited_message(filters.group & ~filters.me)
-async def delete_edited_messages(client, edited_message):
+async def delete_long_edited_messages(client, edited_message: Message):
     # Check if the edited message contains text
     if edited_message.text:
-        await edited_message.delete()
-
+        # Check if the message is considered long (more than 10 words)
+        if len(edited_message.text.split()) > 25:
+            await edited_message.delete()
+    else:
+        # Check if the edited message contains other media types (e.g., stickers, animations)
+        if edited_message.sticker or edited_message.animation:
+            return  # Leave media messages untouched
 
 # ----------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------
