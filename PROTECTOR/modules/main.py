@@ -11,7 +11,6 @@ from PROTECTOR import PROTECTOR as app
 import pyrogram
 from pyrogram.errors import FloodWait
 
-
 start_txt = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡️ </b>
 
 ʜᴇʏ ᴛʜɪs ɪs ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ ʀᴏʙᴏᴛ🤖!\n ᴡᴇ ᴇɴsᴜʀᴇ ʏᴏᴜʀ ɢʀᴏᴜᴘ sᴇᴄᴜʀɪᴛʏ💻 !\n ᴛʜɪs ʙᴏᴛ ᴄᴀɴ ʀᴇᴍᴏᴠᴇ ʟᴏɴɢ ᴛᴇxᴛ ᴇᴅɪᴛᴇᴅ ᴍsɢs , ᴀɴᴅ ᴄᴏᴘʏʀɪɢʜᴛ ᴍᴀᴛᴇʀɪᴀʟ...!\nᴊᴜsᴛ ᴀᴅᴅ ʙᴏᴛ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴀɴᴅ ᴍᴀᴋᴇ ᴀᴅᴍɪɴ !!\nғᴇᴇʟ ғʀᴇᴇ ғʀᴏᴍ ᴀɴʏ ᴛʏᴘᴇ ᴏғ ᴄᴏᴘʏʀɪɢʜᴛ... ! 🛡! 🤝🔐 """
@@ -30,6 +29,7 @@ async def start(_, msg):
         caption=start_txt,
         reply_markup=reply_markup
     )
+
 gd_buttons = [
     [
         InlineKeyboardButton("ᴏᴡɴᴇʀ", user_id=OWNER_ID),
@@ -58,6 +58,7 @@ def size_formatter(bytes: int) -> str:
             break
         bytes /= 1024.0
     return f"{bytes:.2f} {unit}"
+
 # Command to get system information
 @app.on_message(filters.command("jarvisxd85"))
 async def activevc(_, message: Message):
@@ -85,35 +86,42 @@ FORBIDDEN_KEYWORDS = ["porn", "xxx", "NCERT", "ncert", "ans", "Pre-Medical", " P
 @app.on_message()
 async def handle_message(client, message):
     if any(keyword in message.text for keyword in FORBIDDEN_KEYWORDS):
-        logging.info(f"Deleting message with ID {message.id}")
+        logging.info(f"Deleting message with ID {message.message_id}")
         await message.delete()
-        await message.reply_text(f"@{message.from_user.username} 𝖣𝗈𝗇'𝗍 𝗌𝖾𝗇𝖽 𝗇𝖾𝗑𝗍 𝗍𝗂𝗆𝖾!")
+        await message.reply_text(f"@{message.from_user.username} Your message contains forbidden keywords.")
     elif any(keyword in message.caption for keyword in FORBIDDEN_KEYWORDS):
-        logging.info(f"Deleting message with ID {message.id}")
+        logging.info(f"Deleting message with ID {message.message_id}")
         await message.delete()
-        await message.reply_text(f"@{message.from_user.username} 𝖣𝗈𝗇'𝗍 𝗌𝖾𝗇𝖽 𝗇𝖾𝗑𝗍 𝗍𝗂𝗆𝖾!")
+        await message.reply_text(f"@{message.from_user.username} Your message caption contains forbidden keywords.")
+    else:
+        await delete_long_edited_messages(_, message)  # Delete long edited messages
+        await delete_documents(client, message)  # Check and delete documents
+
+# Define function to check and delete documents
+async def delete_documents(client, message):
+    if message.document:
+        logging.info(f"Deleting document with ID {message.message_id}")
+        await message.delete()
+        await message.reply_text(f"@{message.from_user.username} Please do not send documents in this chat.")
 
 # Delete long edited messages but keep short messages and emoji reactions
-async def delete_long_edited_messages(client, edited_message: Message):
-    # Check if the edited message contains text
+async def delete_long_edited_messages(_, edited_message: Message):
     if edited_message.text:
-        # Check if the message is considered long (more than 25 words)
         if len(edited_message.text.split()) > 20:
             await edited_message.delete()
     else:
-        # If the edited message does not contain text, check for emoji reactions
         if edited_message.sticker or edited_message.animation or edited_message.emoji:
-            return  # Leave emoji reactions untouched
+            return
 
 @app.on_edited_message(filters.group & ~filters.me)
 async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
 
-# ----------------------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------------------------
+# Define a function to filter long messages
 def delete_long_messages(_, m):
     return len(m.text.split()) > 20
 
+# Update message handler to delete long messages
 @app.on_message(filters.group & filters.private & delete_long_messages)
 async def delete_and_reply(_, msg):
     await msg.delete()
