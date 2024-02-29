@@ -110,13 +110,11 @@ async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
 
 # Delete long messages in groups and reply with a warning
-
 def delete_long_messages(_, m):
     return len(m.text.split()) > 20
 
-@app.on_message(filters.group & filters.private & delete_long_messages)
+@app.on_message(filters.group & delete_long_messages)
 async def delete_and_reply(_, msg):
     await msg.delete()
     user_mention = msg.from_user.mention
     await app.send_message(msg.chat.id, f"Hey {user_mention}, please keep your messages short!")
-
