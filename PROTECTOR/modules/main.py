@@ -156,20 +156,23 @@ async def delete_and_reply(_, msg):
 
 @app.on_message(filters.animation | filters.audio | filters.document | filters.photo | filters.sticker | filters.video)
 async def keep_reaction_message(client, message: Message):
-    # Check if the message is a reaction message (e.g., sticker, emoji) and return to keep it
+    # Check if the message is a reaction message and proceed with processing
     if message.sticker or message.animation or message.emoji:
-        return
-    # If it's not a reaction message, proceed with other checks or actions
-    pass
-
-async def delete_pdf_files(client, message):
-    if message.document and message.document.mime_type == "application/pdf":
-        warning_message = f"@{message.from_user.username} ʙᴇᴛᴀ ᴊɪ ᴘᴅғ ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ,\n  ᴄᴏᴘʏʀɪɢʜᴛ ʟᴀɢʏᴇɢᴀ🤣🤣"
-        await message.reply_text(warning_message)
-        await message.delete()
-    else:  
+        # You might want to process these messages differently
         pass
+    else:
+        # Process other types of messages
+        pass
+
+async def delete_document_files(client, message):
+    try:
+        if message.document:
+            warning_message = f"@{message.from_user.username} Document files are not allowed."
+            await message.reply_text(warning_message)
+            await message.delete()
+    except Exception as e:
+        print(f"Error deleting document file: {e}")
 
 @app.on_message(filters.group & filters.document)
 async def message_handler(client, message):
-    await delete_pdf_files(client, message)
+    await delete_document_files(client, message)
