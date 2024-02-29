@@ -110,15 +110,14 @@ async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
 
 # Delete long messages in groups and reply with a warning
-import logging
 
-logging.basicConfig(level=logging.INFO)
+MAX_MESSAGE_LENGTH = 25 # Define the maximum allowed length for a message
 
-@app.on_message(filters.group & filters.text)
-async def delete_long_messages(_, message):
-    logging.info(f"Received message: {message.text}")
-    if len(message.text.split()) > 20:
-        logging.info(f"Deleting long message with ID {message.message_id}")
-        await message.delete()
-        user_mention = message.from_user.mention
-        await app.send_message(message.chat.id, f"Hey {user_mention}, please keep your messages short!")
+async def delete_long_messages(client, message: Message):
+    if message.text:
+        if len(message.text.split()) > MAX_MESSAGE_LENGTH:
+            await message.delete()
+
+@app.on_message(filters.group & ~filters.me)
+async def handle_messages(_, message: Message):
+    await delete_long_messages(_, message)
