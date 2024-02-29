@@ -106,7 +106,7 @@ async def delete_long_edited_messages(client, edited_message: Message):
 async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
 
-------------------------------
+#------------------------------
 def delete_long_messages(_, m):
     return len(m.text.split()) > 20
 
