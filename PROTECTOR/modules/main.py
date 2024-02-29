@@ -95,18 +95,22 @@ async def handle_message(client, message):
 
 # Delete long edited messages but keep short messages and emoji reactions
 async def delete_long_edited_messages(client, edited_message: Message):
+    # Check if the edited message contains text
     if edited_message.text:
+        # Check if the message is considered long (more than 25 words)
         if len(edited_message.text.split()) > 20:
             await edited_message.delete()
     else:
+        # If the edited message does not contain text, check for emoji reactions
         if edited_message.sticker or edited_message.animation or edited_message.emoji:
-            return
+            return  # Leave emoji reactions untouched
 
 @app.on_edited_message(filters.group & ~filters.me)
 async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
 
-#------------------------------
+# ----------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 def delete_long_messages(_, m):
     return len(m.text.split()) > 20
 
@@ -115,20 +119,3 @@ async def delete_and_reply(_, msg):
     await msg.delete()
     user_mention = msg.from_user.mention
     await app.send_message(msg.chat.id, f"Hey {user_mention}, please keep your messages short!")
-
-# Function to delete documents
-async def delete_document_files(client, message):
-    try:
-        if message.document:
-            warning_message = f"@{message.from_user.username} Document files are not allowed."
-            await message.reply_text(warning_message)
-            await message.delete()
-    except Exception as e:
-        print(f"Error deleting document file: {e}")
-
-# Message handler to check and delete documents
-@app.on_message(filters.group & filters.document)
-async def message_handler(client, message):
-    await delete_document_files(client, message)
-
-
