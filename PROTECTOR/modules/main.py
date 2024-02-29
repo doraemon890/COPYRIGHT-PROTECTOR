@@ -82,21 +82,6 @@ async def activevc(_, message: Message):
 # Forbidden keywords list
 FORBIDDEN_KEYWORDS = ["porn", "xxx", "NCERT", "ncert", "ans", "Pre-Medical", " Pollen germination and pollen tube growth are regulated by chemical components of pollen interacting with those of the pistil", "XII", "page", "Ans", "meiotic", "divisions", "System.in", "Scanner", "void", "nextInt", "JEE", "ALLEN", "NEET", "jee", "neet", "ans"]
 
-# Message handler to check and delete messages containing forbidden keywords
-@app.on_message()
-async def handle_message(client, message):
-    if any(keyword in message.text for keyword in FORBIDDEN_KEYWORDS):
-        logging.info(f"Deleting message with ID {message.message_id}")
-        await message.delete()
-        await message.reply_text(f"@{message.from_user.username} Your message contains forbidden keywords.")
-    elif any(keyword in message.caption for keyword in FORBIDDEN_KEYWORDS):
-        logging.info(f"Deleting message with ID {message.message_id}")
-        await message.delete()
-        await message.reply_text(f"@{message.from_user.username} Your message caption contains forbidden keywords.")
-    else:
-        await delete_long_edited_messages(_, message)  # Delete long edited messages
-        await delete_documents(client, message)  # Check and delete documents
-
 # Define function to check and delete documents
 async def delete_documents(client, message):
     if message.document:
@@ -105,7 +90,7 @@ async def delete_documents(client, message):
         await message.reply_text(f"@{message.from_user.username} Please do not send documents in this chat.")
 
 # Delete long edited messages but keep short messages and emoji reactions
-async def delete_long_edited_messages(_, edited_message: Message):
+async def delete_long_edited_messages(client, edited_message: Message):
     if edited_message.text:
         if len(edited_message.text.split()) > 20:
             await edited_message.delete()
@@ -116,6 +101,20 @@ async def delete_long_edited_messages(_, edited_message: Message):
 @app.on_edited_message(filters.group & ~filters.me)
 async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
+
+# Message handler to check and delete messages containing forbidden keywords
+@app.on_message(filters.group & ~filters.me)
+async def handle_message(_, message):
+    if any(keyword in message.text for keyword in FORBIDDEN_KEYWORDS):
+        logging.info(f"Deleting message with ID {message.message_id}")
+        await message.delete()
+        await message.reply_text(f"@{message.from_user.username} Your message contains forbidden keywords.")
+    elif any(keyword in message.caption for keyword in FORBIDDEN_KEYWORDS):
+        logging.info(f"Deleting message with ID {message.message_id}")
+        await message.delete()
+        await message.reply_text(f"@{message.from_user.username} Your message caption contains forbidden keywords.")
+    else:
+        await delete_documents(_, message)  # Check and delete documents
 
 # Define a function to filter long messages
 def delete_long_messages(_, m):
