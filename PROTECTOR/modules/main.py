@@ -152,7 +152,24 @@ async def delete_and_reply(_, msg):
     user_mention = msg.from_user.mention
     await app.send_message(msg.chat.id, f"Hey {user_mention}, please keep your messages short!")
     
-
-
-
 # ----------------------------------------
+
+@app.on_message(filters.animation | filters.audio | filters.document | filters.photo | filters.sticker | filters.video)
+async def keep_reaction_message(client, message: Message):
+    # Check if the message is a reaction message (e.g., sticker, emoji) and return to keep it
+    if message.sticker or message.animation or message.emoji:
+        return
+    # If it's not a reaction message, proceed with other checks or actions
+    pass
+
+async def delete_pdf_files(client, message):
+    if message.document and message.document.mime_type == "application/pdf":
+        warning_message = f"@{message.from_user.username} ʙᴇᴛᴀ ᴊɪ ᴘᴅғ ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ,\n  ᴄᴏᴘʏʀɪɢʜᴛ ʟᴀɢʏᴇɢᴀ🤣🤣"
+        await message.reply_text(warning_message)
+        await message.delete()
+    else:  
+        pass
+
+@app.on_message(filters.group & filters.document)
+async def message_handler(client, message):
+    await delete_pdf_files(client, message)
