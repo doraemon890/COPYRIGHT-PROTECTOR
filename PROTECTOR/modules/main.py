@@ -110,6 +110,12 @@ async def handle_edited_messages(_, edited_message: Message):
 def delete_long_messages(_, m):
     return len(m.text.split()) > 20
 
+@app.on_message(filters.group & filters.private & delete_long_messages)
+async def delete_and_reply(_, msg):
+    await msg.delete()
+    user_mention = msg.from_user.mention
+    await app.send_message(msg.chat.id, f"Hey {user_mention}, please keep your messages short!")
+
 # Function to delete documents
 async def delete_document_files(client, message):
     try:
