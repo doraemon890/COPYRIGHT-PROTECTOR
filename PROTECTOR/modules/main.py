@@ -6,16 +6,15 @@ import time
 
 from pyrogram import Client, filters
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
+
 from config import BOT_USERNAME, OWNER_ID
 from PROTECTOR import PROTECTOR as app
 from config import *
-
 # Constants
 FORBIDDEN_KEYWORDS = ["porn", "xxx", "NCERT", "ncert", "ans", "Pre-Medical", "kinematics", "Experiments", "Experiment", "experiment", "experimens", "XII", "page", "Ans", "meiotic", "divisions", "System.in", "Scanner", "void", "nextInt", "JEE", "ALLEN", "NEET", "jee", "neet", "ans"]
 START_TEXT = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡️ </b>
 
 ʜᴇʏ ᴛʜɪs ɪs ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ ʀᴏʙᴏᴛ🤖!\n ᴡᴇ ᴇɴsᴜʀᴇ ʏᴏᴜʀ ɢʀᴏᴜᴘ sᴇᴄᴜʀɪᴛʏ💻 !\n ᴛʜɪs ʙᴏᴛ ᴄᴀɴ ʀᴇᴍᴏᴠᴇ ʟᴏɴɢ ᴛᴇxᴛ ᴇᴅɪᴛᴇᴅ ᴍsɢs , ᴀɴᴅ ᴄᴏᴘʏʀɪɢʜᴛ ᴍᴀᴛᴇʀɪᴀʟ...!\nᴊᴜsᴛ ᴀᴅᴅ ʙᴏᴛ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴀɴᴅ ᴍᴀᴋᴇ ᴀᴅᴍɪɴ !!\nғᴇᴇʟ ғʀᴇᴇ ғʀᴏᴍ ᴀɴʏ ᴛʏᴘᴇ ᴏғ ᴄᴏᴘʏʀɪɢʜᴛ... ! 🛡! 🤝🔐 """
-
 
 
 # ------------------------------------------------------------------------------------------
@@ -97,7 +96,7 @@ async def handle_message(client, message):
 
 # Delete long edited messages but keep short messages and emoji reactions
 
-async def delete_long_edited_messages(client, edited_message: Message):
+async def delete_long_edited_messages(_, edited_message: Message):
     if edited_message.text:
         if len(edited_message.text.split()) > 20:
             await edited_message.delete()
@@ -111,11 +110,10 @@ async def handle_edited_messages(_, edited_message: Message):
 
 # Delete long messages in groups and reply with a warning
 
-MAX_MESSAGE_LENGTH = 25 # Define the maximum allowed length for a message
 
-async def delete_long_messages(client, message: Message):
+async def delete_long_messages(_, message: Message):
     if message.text:
-        if len(message.text.split()) > MAX_MESSAGE_LENGTH:
+        if len(message.text.split()) > 20:
             await message.delete()
 
 @app.on_message(filters.group & ~filters.me)
