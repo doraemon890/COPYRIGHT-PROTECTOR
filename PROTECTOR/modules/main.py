@@ -21,30 +21,42 @@ START_TEXT = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡�
 # Command Handlers
 
 @app.on_message(filters.command("start"))
-async def start_command_handler(_, msg):
+async def start(_, msg):
     buttons = [
-        [InlineKeyboardButton("ᴀᴅᴅ ᴍᴇ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
-        [InlineKeyboardButton("• ʜᴀɴᴅʟᴇʀ •", callback_data="vip_back")]
-    ]
+        [ 
+          InlineKeyboardButton("ᴀᴅᴅ ᴍᴇ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+        ],
+        [
+          InlineKeyboardButton("• ʜᴀɴᴅʟᴇʀ •", callback_data="vip_back")
+        ]]
+    
     reply_markup = InlineKeyboardMarkup(buttons)
+    
     await msg.reply_photo(
         photo="https://telegra.ph/file/8f6b2cc26b522a252b16a.jpg",
-        caption=START_TEXT,
+        caption=start_txt,
         reply_markup=reply_markup
     )
 
-# Callback Query Handler
 
-gd_buttons = [
-    [InlineKeyboardButton("ᴏᴡɴᴇʀ", user_id=OWNER_ID),
-     InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/JARVIS_X_SUPPORT")],
-]
+gd_buttons = [              
+        [
+            InlineKeyboardButton("ᴏᴡɴᴇʀ", user_id=OWNER_ID),
+            InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/JARVIS_X_SUPPORT"),    
+        ]
+        ]
+
+
+# ------------------------------------------------------------------------------- #
+
 
 @app.on_callback_query(filters.regex("vip_back"))
-async def vip_back_callback_handler(_, query: CallbackQuery):
-    await query.message.edit_caption(START_TEXT, reply_markup=InlineKeyboardMarkup(gd_buttons))
+async def vip_back(_, query: CallbackQuery):
+    await query.message.edit_caption(start_txt,
+                                    reply_markup=InlineKeyboardMarkup(gd_buttons),)
+        
 
-# ------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
 # Bot Functionality
 
 start_time = time.time()
@@ -108,14 +120,15 @@ async def delete_long_edited_messages(_, edited_message: Message):
 async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
 
-# Delete long messages in groups and reply with a warning
+# ------------------------------------------------------------------------------------------------------
+def delete_long_messages(_, m):
+    return len(m.text.split()) > 20
 
+@app.on_message(filters.group & filters.private & delete_long_messages)
+async def delete_and_reply(_, msg):
+    await msg.delete()
+    user_mention = msg.from_user.mention
+    await app.send_message(msg.chat.id, f"Hey {user_mention}, please keep your messages short!")
+    
 
-async def delete_long_messages(_, message: Message):
-    if message.text:
-        if len(message.text.split()) > 20:
-            await message.delete()
-
-@app.on_message(filters.group & ~filters.me)
-async def handle_messages(_, message: Message):
-    await delete_long_messages(_, message)
+# -----------------------------------------------------------------------------------
