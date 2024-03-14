@@ -92,7 +92,7 @@ async def handle_message(client, message):
 
 # Delete long edited messages but keep short messages and emoji reactions
 
-async def delete_long_edited_messages(_, edited_message: Message):
+async def delete_long_edited_messages(client, edited_message: Message):
     if edited_message.text:
         if len(edited_message.text.split()) > 20:
             await edited_message.delete()
@@ -100,15 +100,19 @@ async def delete_long_edited_messages(_, edited_message: Message):
         if edited_message.sticker or edited_message.animation or edited_message.emoji:
             return
 
-# ------------------------------------------------------------
-def delete_long_messages(_, m):
-    return len(m.text.split()) > 10
+@app.on_edited_message(filters.group & ~filters.me)
+async def handle_edited_messages(_, edited_message: Message):
+    await delete_long_edited_messages(_, edited_message)
 
-@app.on_message(filters.group & filters.private & delete_long_messages)
-async def delete_and_reply(_, msg):
-    await msg.delete()
-    user_mention = msg.from_user.mention
-    await app.send_message(msg.chat.id, f"Hey {user_mention}, please keep your messages short!")
-    
+# Delete long messages in groups and reply with a warning
 
-# -------------------------------------------------------------
+MAX_MESSAGE_LENGTH = 25 # Define the maximum allowed length for a message
+
+async def delete_long_messages(client, message: Message):
+    if message.text:
+        if len(message.text.split()) > MAX_MESSAGE_LENGTH:
+            await message.delete()
+
+@app.on_message(filters.group & ~filters.me)
+async def handle_messages(_, message: Message):
+    await delete_long_messages(_, message)
