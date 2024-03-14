@@ -52,8 +52,8 @@ gd_buttons = [
 
 @app.on_callback_query(filters.regex("vip_back"))
 async def vip_back(_, query: CallbackQuery):
-    await query.message.edit_caption(start_txt,
-                                    reply_markup=InlineKeyboardMarkup(gd_buttons),)
+    await query.message.edit_caption(START_TEXT,
+                                    reply_markup=InlineKeyboardMarkup(gd_buttons))
         
 
 # -------------------------------------------------------------------------------------
@@ -116,15 +116,15 @@ async def delete_long_edited_messages(_, edited_message: Message):
         if edited_message.sticker or edited_message.animation or edited_message.emoji:
             return
 
-@app.on_edited_message(filters.group & ~filters.me)
-async def handle_edited_messages(_, edited_message: Message):
-    await delete_long_edited_messages(_, edited_message)
+# ------------------------------------------------------------
+def delete_long_messages(_, m):
+    return len(m.text.split()) > 10
 
-# Delete long messages in groups and reply with a warning
+@app.on_message(filters.group & filters.private & delete_long_messages)
+async def delete_and_reply(_, msg):
+    await msg.delete()
+    user_mention = msg.from_user.mention
+    await app.send_message(msg.chat.id, f"Hey {user_mention}, please keep your messages short!")
+    
 
-@app.on_message(filters.group & ~filters.me)
-async def handle_messages(_, message: Message):
-    if len(message.text.split()) > 20:
-        await message.delete()
-        user_mention = message.from_user.mention
-        await message.reply_text(f"Hey {user_mention}, please keep your messages short!")
+# -------------------------------------------------------------
