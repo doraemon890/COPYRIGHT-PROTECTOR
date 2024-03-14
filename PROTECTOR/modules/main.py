@@ -27,7 +27,7 @@ async def start(_, msg):
           InlineKeyboardButton("ᴀᴅᴅ ᴍᴇ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
         ],
         [
-          InlineKeyboardButton("• ʜᴀɴᴅʟᴇʀ •", callback_data="vip_back")
+          InlineKeyboardButton("• sᴜᴘᴘᴏʀᴛ •", url=f"https://t.me/JARVIS_X_SUPPORT")
         ]]
     
     reply_markup = InlineKeyboardMarkup(buttons)
@@ -39,24 +39,8 @@ async def start(_, msg):
     )
 
 
-gd_buttons = [              
-        [
-            InlineKeyboardButton("ᴏᴡɴᴇʀ", user_id=OWNER_ID),
-            InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/JARVIS_X_SUPPORT"),    
-        ]
-        ]
+# ------------------------------------------------------------------------------------------
 
-
-# ------------------------------------------------------------------------------- #
-
-
-@app.on_callback_query(filters.regex("vip_back"))
-async def vip_back(_, query: CallbackQuery):
-    await query.message.edit_caption(START_TEXT,
-                                    reply_markup=InlineKeyboardMarkup(gd_buttons))
-        
-
-# -------------------------------------------------------------------------------------
 # Bot Functionality
 
 start_time = time.time()
