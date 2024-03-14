@@ -34,7 +34,7 @@ async def start(_, msg):
     
     await msg.reply_photo(
         photo="https://telegra.ph/file/8f6b2cc26b522a252b16a.jpg",
-        caption=start_txt,
+        caption=START_TEXT,
         reply_markup=reply_markup
     )
 
@@ -120,15 +120,11 @@ async def delete_long_edited_messages(_, edited_message: Message):
 async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
 
-# ------------------------------------------------------------------------------------------------------
-def delete_long_messages(_, m):
-    return len(m.text.split()) > 20
+# Delete long messages in groups and reply with a warning
 
-@app.on_message(filters.group & filters.private & delete_long_messages)
-async def delete_and_reply(_, msg):
-    await msg.delete()
-    user_mention = msg.from_user.mention
-    await app.send_message(msg.chat.id, f"Hey {user_mention}, please keep your messages short!")
-    
-
-# -----------------------------------------------------------------------------------
+@app.on_message(filters.group & ~filters.me)
+async def handle_messages(_, message: Message):
+    if len(message.text.split()) > 20:
+        await message.delete()
+        user_mention = message.from_user.mention
+        await message.reply_text(f"Hey {user_mention}, please keep your messages short!")
