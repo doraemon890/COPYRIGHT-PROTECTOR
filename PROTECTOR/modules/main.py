@@ -21,7 +21,7 @@ START_TEXT = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡�
 # ------------------------------------------------------------------------------------------
 # Command Handlers
 
-@app.on_message(filters.command("rajnishayushilovemaineteranaamdilrkhdiya"))
+@app.on_message(filters.command("start"))
 async def start_command_handler(_, msg):
     buttons = [
         [InlineKeyboardButton("ᴀᴅᴅ ᴍᴇ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
@@ -29,7 +29,7 @@ async def start_command_handler(_, msg):
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
     await msg.reply_photo(
-        photo="https://telegra.ph/file/3c98dbb4e941e05912697.jpg",
+        photo="https://telegra.ph/file/8f6b2cc26b522a252b16a.jpg",
         caption=START_TEXT,
         reply_markup=reply_markup
     )
@@ -38,7 +38,7 @@ async def start_command_handler(_, msg):
 
 gd_buttons = [
     [InlineKeyboardButton("ᴏᴡɴᴇʀ", user_id=OWNER_ID),
-     InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/CHATTING_2024")],
+     InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/JARVIS_X_SUPPORT")],
 ]
 
 @app.on_callback_query(filters.regex("vip_back"))
@@ -63,7 +63,7 @@ def size_formatter(bytes: int) -> str:
         bytes /= 1024.0
     return f"{bytes:.2f} {unit}"
 
-@app.on_message(filters.command("jarvisxd85"))
+@app.on_message(filters.command("ping"))
 async def activevc(_, message: Message):
     uptime = time_formatter((time.time() - start_time) * 1000)
     cpu = psutil.cpu_percent()
