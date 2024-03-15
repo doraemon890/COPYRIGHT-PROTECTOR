@@ -17,30 +17,31 @@ START_TEXT = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡�
 ʜᴇʏ ᴛʜɪs ɪs ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ ʀᴏʙᴏᴛ🤖!\n ᴡᴇ ᴇɴsᴜʀᴇ ʏᴏᴜʀ ɢʀᴏᴜᴘ sᴇᴄᴜʀɪᴛʏ💻 !\n ᴛʜɪs ʙᴏᴛ ᴄᴀɴ ʀᴇᴍᴏᴠᴇ ʟᴏɴɢ ᴛᴇxᴛ ᴇᴅɪᴛᴇᴅ ᴍsɢs , ᴀɴᴅ ᴄᴏᴘʏʀɪɢʜᴛ ᴍᴀᴛᴇʀɪᴀʟ...!\nᴊᴜsᴛ ᴀᴅᴅ ʙᴏᴛ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴀɴᴅ ᴍᴀᴋᴇ ᴀᴅᴍɪɴ !!\nғᴇᴇʟ ғʀᴇᴇ ғʀᴏᴍ ᴀɴʏ ᴛʏᴘᴇ ᴏғ ᴄᴏᴘʏʀɪɢʜᴛ... ! 🛡! 🤝🔐 """
 
 
-# ------------------------------------------------------------------------------------------
-# Command Handlers
-
+##---------------------------------------------------------------------------------
 @app.on_message(filters.command("start"))
-async def start(_, msg):
+async def start_command_handler(_, msg):
     buttons = [
-        [ 
-          InlineKeyboardButton("ᴀᴅᴅ ᴍᴇ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
-        ],
-        [
-          InlineKeyboardButton("• sᴜᴘᴘᴏʀᴛ •", url=f"https://t.me/JARVIS_X_SUPPORT")
-        ]]
-    
+        [InlineKeyboardButton("ᴀᴅᴅ ᴍᴇ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
+        [InlineKeyboardButton("• ʜᴀɴᴅʟᴇʀ •", callback_data="vip_back")]
+    ]
     reply_markup = InlineKeyboardMarkup(buttons)
-    
     await msg.reply_photo(
         photo="https://telegra.ph/file/8f6b2cc26b522a252b16a.jpg",
         caption=START_TEXT,
         reply_markup=reply_markup
     )
 
+# Callback Query Handler
+gd_buttons = [
+    [InlineKeyboardButton("ᴏᴡɴᴇʀ", url=f"https://t.me/{BOT_USERNAME}?start=owner"),
+     InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/CHATTING_2024")],
+]
 
-# ------------------------------------------------------------------------------------------
+@app.on_callback_query(filters.regex("vip_back"))
+async def vip_back_callback_handler(_, query: CallbackQuery):
+    await query.message.edit_caption(caption=START_TEXT, reply_markup=InlineKeyboardMarkup(gd_buttons))
 
+##---------------------------------------------------------------------------------
 # Bot Functionality
 
 start_time = time.time()
