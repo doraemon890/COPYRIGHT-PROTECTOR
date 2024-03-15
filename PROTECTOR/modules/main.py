@@ -22,8 +22,8 @@ START_TEXT = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡�
 async def start_command_handler(_, msg):
     buttons = [
         [InlineKeyboardButton("ᴀᴅᴅ ᴍᴇ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
-        [InlineKeyboardButton("• ʜᴀɴᴅʟᴇʀ •", callback_data="vip_back")],
-        [InlineKeyboardButton("• ʙᴀᴄᴋ •", callback_data="back_to_start")]
+        [InlineKeyboardButton("• ʜᴀɴᴅʟᴇʀ •", callback_data="vip_back")]
+        
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
     await msg.reply_photo(
@@ -35,7 +35,8 @@ async def start_command_handler(_, msg):
 # Callback Query Handler
 gd_buttons = [
     [InlineKeyboardButton("ᴏᴡɴᴇʀ", url=f"https://t.me/JARVIS_V2"),
-     InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/JARVIS_X_SUPPORT")],
+     InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/JARVIS_X_SUPPORT"),
+     InlineKeyboardButton("• ʙᴀᴄᴋ •", callback_data="back_to_start")]
 ]
 
 @app.on_callback_query(filters.regex("vip_back"))
