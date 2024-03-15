@@ -22,7 +22,8 @@ START_TEXT = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡�
 async def start_command_handler(_, msg):
     buttons = [
         [InlineKeyboardButton("ᴀᴅᴅ ᴍᴇ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
-        [InlineKeyboardButton("• ʜᴀɴᴅʟᴇʀ •", callback_data="vip_back")]
+        [InlineKeyboardButton("• ʜᴀɴᴅʟᴇʀ •", callback_data="vip_back")],
+        [InlineKeyboardButton("• ʙᴀᴄᴋ •", callback_data="back_to_start")]
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
     await msg.reply_photo(
@@ -40,6 +41,13 @@ gd_buttons = [
 @app.on_callback_query(filters.regex("vip_back"))
 async def vip_back_callback_handler(_, query: CallbackQuery):
     await query.message.edit_caption(caption=START_TEXT, reply_markup=InlineKeyboardMarkup(gd_buttons))
+
+@app.on_callback_query(filters.regex("back_to_start"))
+async def back_to_start_callback_handler(_, query: CallbackQuery):
+    await query.answer()
+    await query.message.delete()
+    await start_command_handler(_, query.message)
+
 
 ##---------------------------------------------------------------------------------
 # Bot Functionality
