@@ -5,7 +5,7 @@
     <b>ᴠɪsɪᴛᴏʀs</b><br>
  -->    <img align="middle" src="https://profile-counter.glitch.me/doraemon890/count.svg" />
 </p>
-<h1 align ="center"><img src="https://readme-typing-svg.herokuapp.com?color=00BFFF&width=350&lines=sᴛʀɪɴɢ+ɢᴇɴʀᴀᴛᴏʀ+ʙᴏᴛ"></b></h1>
+<h1 align ="center"><img src="https://readme-typing-svg.herokuapp.com?color=00BFFF&width=350&lines=𝙲𝚘𝚙𝚢𝚛𝚒𝚐𝚑+𝙿𝚛𝚘𝚝𝚎𝚌𝚝𝚘�+ʙᴏᴛ"></b></h1>
 
 <p align="center"><a href="https://t.me/jarvis2O"><img src="https://telegra.ph/file/20d1bcedcf901bed9bf65.jpg" width="600"></a></p>
 
