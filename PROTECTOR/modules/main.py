@@ -13,7 +13,8 @@ from config import *
 # Constants
 FORBIDDEN_KEYWORDS = [
     "porn", "xxx", "NCERT", "ncert", "ans", "Pre-Medical", 
-    "kinematics", "Experiment", "experiments", "Ans", "jee"
+    "kinematics", "Experiment", "experiments", "Ans", "jee",
+    "Allen", "pre-medical", "institute"
 ]
 
 START_TEXT = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡️ </b>
@@ -23,7 +24,7 @@ START_TEXT = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡�
 ᴛʜɪs ʙᴏᴛ ᴄᴀɴ ʀᴇᴍᴏᴠᴇ ʟᴏɴɢ ᴛᴇxᴛ ᴇᴅɪᴛᴇᴅ ᴍsɢs , ᴀɴᴅ 
 ᴄᴏᴘʏʀɪɢʜᴛ ᴍᴀᴛᴇʀɪᴀʟ...!\n
 ᴊᴜsᴛ ᴀᴅᴅ ʙᴏᴛ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴀɴᴅ ᴍᴀᴋᴇ ᴀᴅᴍɪɴ !!\n
-ғᴇᴇʟ ғʀᴇᴇ ғʀᴏᴍ ᴀɴʏ ᴛʏᴘᴇ ᴏғ ᴄᴏᴘʏʀɪɢʜᴛ... ! 🛡! 🤝🔐 
+ғᴇᴇʟ ғʀᴇᴇ ғʀᴏᴍ ᴀɴʏ ᴛʏᴘᴇ ᴏғ ᴄᴏᴘʏʀɪɢʜᴛ... ! 🛡
 """
 
 # Start Command Handler
@@ -116,7 +117,7 @@ async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
 
 # Delete long messages in groups and reply with a warning
-MAX_MESSAGE_LENGTH = 15  # Define the maximum allowed length for a message
+MAX_MESSAGE_LENGTH = 20 # Define the maximum allowed length for a message
 
 async def delete_long_messages(client, message: Message):
     if message.text and len(message.text.split()) > MAX_MESSAGE_LENGTH:
