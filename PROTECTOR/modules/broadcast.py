@@ -1,9 +1,9 @@
 import asyncio
 import traceback
-from config import OWNER_ID
 from pyrogram import Client, filters
 from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid
 from pyrogram.types import Message
+from config import OWNER_ID
 from PROTECTOR import PROTECTOR as app
 from PROTECTOR.helper import get_chats, get_users
 
@@ -30,7 +30,7 @@ async def broadcast(client: Client, message: Message):
         return
 
     exmsg = await message.reply_text("Started broadcasting!")
-    
+
     all_chats = await get_chats() or []
     all_users = await get_users() or []
 
@@ -94,4 +94,3 @@ async def announce(client: Client, message: Message):
         f"Broadcast complete. {failed_chats} groups failed to receive the message, probably due to being kicked. "
         f"{failed_users} users failed to receive the message, probably due to being banned."
     )
-    
