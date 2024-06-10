@@ -2,11 +2,12 @@ from config import MONGO_URL
 from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 
 mongo = MongoCli(MONGO_URL)
-db = mongo.usersdb  # Ensure this points to the correct database
+db = mongo.get_database("Kishu")  # Ensure this points to the correct database name
+users_collection = db.get_collection("usersdb")  # Ensure this points to the correct collection name
 
 async def get_users():
     user_list = []
-    async for user in db.users.find({"user": {"$gt": 0}}):  # Ensure 'users' is the correct collection
+    async for user in users_collection.find({"user": {"$gt": 0}}):
         user_list.append(user['user'])
     print(f"Debug: get_users() -> {user_list}")
     return user_list
@@ -18,9 +19,9 @@ async def get_user(user):
 async def add_user(user):
     users = await get_users()
     if user not in users:
-        await db.users.insert_one({"user": user})
+        await users_collection.insert_one({"user": user})
 
 async def del_user(user):
     users = await get_users()
     if user in users:
-        await db.users.delete_one({"user": user})
+        await users_collection.delete_one({"user": user})
