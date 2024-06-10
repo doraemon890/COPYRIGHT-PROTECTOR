@@ -5,7 +5,7 @@ from pyrogram import Client, filters
 from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid
 from pyrogram.types import Message
 from PROTECTOR import PROTECTOR as app
-from PROTECTOR.helper import *
+from PROTECTOR.helper import get_chats, get_users
 
 async def send_msg(user_id: int, message: Message) -> tuple[int, str]:
     try:
@@ -30,8 +30,12 @@ async def broadcast(client: Client, message: Message):
         return
 
     exmsg = await message.reply_text("Started broadcasting!")
+    
     all_chats = await get_chats() or []
     all_users = await get_users() or []
+
+    print(f"Debug: All Chats - {all_chats}")
+    print(f"Debug: All Users - {all_users}")
 
     done_chats, done_users, failed_chats, failed_users = 0, 0, 0, 0
 
@@ -67,6 +71,9 @@ async def announce(client: Client, message: Message):
     chats = await get_chats() or []
     users = await get_users() or []
 
+    print(f"Debug: Announce Chats - {chats}")
+    print(f"Debug: Announce Users - {users}")
+
     failed_chats, failed_users = 0, 0
 
     for chat in chats:
@@ -87,3 +94,4 @@ async def announce(client: Client, message: Message):
         f"Broadcast complete. {failed_chats} groups failed to receive the message, probably due to being kicked. "
         f"{failed_users} users failed to receive the message, probably due to being banned."
     )
+    
