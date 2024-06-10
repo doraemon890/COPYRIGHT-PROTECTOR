@@ -5,7 +5,7 @@ from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, Peer
 from pyrogram.types import Message
 from config import OWNER_ID
 from PROTECTOR import PROTECTOR as app
-from PROTECTOR.helper import get_chats, get_users
+from PROTECTOR.helper import *
 
 async def send_msg(user_id: int, message: Message) -> tuple[int, str]:
     try:
