@@ -10,13 +10,6 @@ from config import BOT_USERNAME, OWNER_ID
 from PROTECTOR import PROTECTOR as app
 from config import *
 
-# Constants
-FORBIDDEN_KEYWORDS = [
-    "porn", "xxx", "NCERT", "ncert", "ans", "Pre-Medical", 
-    "kinematics", "Experiment", "experiments", "Ans", "jee",
-    "Allen", "pre-medical", "institute"
-]
-
 START_TEXT = """<b> 🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡️ </b>
 
 ʜᴇʏ ᴛʜɪs ɪs ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ ʀᴏʙᴏᴛ🤖!\n 
@@ -55,8 +48,7 @@ async def vip_back_callback_handler(_, query: CallbackQuery):
 @app.on_callback_query(filters.regex("back_to_start"))
 async def back_to_start_callback_handler(_, query: CallbackQuery):
     await query.answer()
-    await query.message.delete()
-    await start_command_handler(_, query.message)
+    await query.message.edit_caption(caption=START_TEXT, reply_markup=InlineKeyboardMarkup(gd_buttons))
 
 # Bot Functionality
 start_time = time.time()
@@ -92,18 +84,6 @@ async def activevc(_, message: Message):
     )
 
     await message.reply(reply_text, quote=True)
-
-# Handle Forbidden Keywords
-@app.on_message()
-async def handle_message(client, message):
-    if any(keyword in message.text for keyword in FORBIDDEN_KEYWORDS):
-        logging.info(f"Deleting message with ID {message.id}")
-        await message.delete()
-        await message.reply_text(f"@{message.from_user.username} 𝖣𝗈𝗇'𝗍 𝗌𝖾𝗇𝖽 𝗇𝖾𝗑𝗍 𝗍𝗂𝗆𝖾!")
-    elif any(keyword in message.caption for keyword in FORBIDDEN_KEYWORDS):
-        logging.info(f"Deleting message with ID {message.id}")
-        await message.delete()
-        await message.reply_text(f"@{message.from_user.username} 𝖣𝗈𝗇'𝗍 𝗌𝖾𝗇𝖽 𝗇𝖾𝗑𝗍 𝗍𝗂𝗆𝖾!")
 
 # Delete long edited messages but keep short messages and emoji reactions
 async def delete_long_edited_messages(client, edited_message: Message):
