@@ -21,7 +21,7 @@ START_TEXT = """<b>🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡️
 ғᴇᴇʟ ғʀᴇᴇ ғʀᴏᴍ ᴀɴʏ ᴛʏᴘᴇ ᴏғ **ᴄᴏᴘʏʀɪɢʜᴛ** 🛡️
 """
 AUTHORIZED_USERS_FILE = "authorized_users.json"
-MAX_MESSAGE_LENGTH = 20
+MAX_MESSAGE_LENGTH = 30
 
 # Load authorized users from file
 def load_authorized_users():
@@ -147,6 +147,7 @@ async def delete_long_messages(client, message: Message):
     if message.from_user.id in AUTHORIZED_USERS:
         return
     if message.text and len(message.text.split()) > MAX_MESSAGE_LENGTH:
+        await message.reply_text("Please keep your message short.")
         await message.delete()
 
 @app.on_message(filters.group & ~filters.me)
