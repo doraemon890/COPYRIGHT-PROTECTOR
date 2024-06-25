@@ -23,6 +23,13 @@ START_TEXT = """<b>🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡️
 AUTHORIZED_USERS_FILE = "authorized_users.json"
 MAX_MESSAGE_LENGTH = 40
 
+# Define gd_buttons
+gd_buttons = [
+    [InlineKeyboardButton("ᴏᴡɴᴇʀ", url="https://t.me/JARVIS_V2"),
+     InlineKeyboardButton("• ʙᴀᴄᴋ •", callback_data="back_to_start"),
+     InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/JARVIS_V_SUPPORT")]
+]
+
 # Load authorized users from file
 def load_authorized_users():
     if os.path.exists(AUTHORIZED_USERS_FILE):
@@ -50,6 +57,10 @@ def size_formatter(bytes: int) -> str:
             break
         bytes /= 1024.0
     return f"{bytes:.2f} {unit}"
+
+async def is_group_owner(client, chat_id, user_id):
+    member = await client.get_chat_member(chat_id, user_id)
+    return member.status == 'creator'
 
 # Command Handlers
 @app.on_message(filters.command("start"))
@@ -87,8 +98,7 @@ async def auth_user(_, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
 
-    member = await app.get_chat_member(chat_id, user_id)
-    if member.status != 'creator':
+    if not await is_group_owner(_, chat_id, user_id):
         await message.reply_text("You must be the group owner to authorize users.")
         return
 
@@ -112,8 +122,7 @@ async def unauth_user(_, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
 
-    member = await app.get_chat_member(chat_id, user_id)
-    if member.status != 'creator':
+    if not await is_group_owner(_, chat_id, user_id):
         await message.reply_text("You must be the group owner to unauthorize users.")
         return
 
@@ -154,7 +163,7 @@ async def back_to_start_callback_handler(_, query: CallbackQuery):
 # Message Handlers
 async def delete_long_edited_messages(client, edited_message: Message):
     chat_id = edited_message.chat.id
-    if edited_message.from_user and (edited_message.from_user.id in AUTHORIZED_USERS.get(chat_id, []) or (await app.get_chat_member(chat_id, edited_message.from_user.id)).status == 'creator'):
+    if edited_message.from_user and (edited_message.from_user.id in AUTHORIZED_USERS.get(chat_id, []) or await is_group_owner(client, chat_id, edited_message.from_user.id)):
         return
     if edited_message.text and len(edited_message.text.split()) > 15:
         await edited_message.reply_text(f"{edited_message.from_user.mention}, ʏᴏᴜʀ ᴇᴅɪᴛᴇᴅ ᴍᴇssᴀɢᴇ ɪs ᴛᴏᴏ ʟᴏɴɢ ᴛʜᴀᴛ's ᴡʜʏ ɪ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇᴅ ɪᴛ.")
@@ -168,7 +177,7 @@ async def handle_edited_messages(_, edited_message: Message):
 
 async def delete_long_messages(client, message: Message):
     chat_id = message.chat.id
-    if message.from_user and (message.from_user.id in AUTHORIZED_USERS.get(chat_id, []) or (await app.get_chat_member(chat_id, message.from_user.id)).status == 'creator'):
+    if message.from_user and (message.from_user.id in AUTHORIZED_USERS.get(chat_id, []) or await is_group_owner(client, chat_id, message.from_user.id)):
         return
     if message.text and len(message.text.split()) > MAX_MESSAGE_LENGTH:
         await message.reply_text(f"{message.from_user.mention}, ᴘʟᴇᴀsᴇ ᴋᴇᴇᴘ ʏᴏᴜʀ ᴍᴇssᴀɢᴇ sʜᴏʀᴛ.")
