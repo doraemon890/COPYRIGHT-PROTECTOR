@@ -154,7 +154,7 @@ async def back_to_start_callback_handler(_, query: CallbackQuery):
 # Message Handlers
 async def delete_long_edited_messages(client, edited_message: Message):
     chat_id = edited_message.chat.id
-    if edited_message.from_user.id in AUTHORIZED_USERS.get(chat_id, []) or (await app.get_chat_member(chat_id, edited_message.from_user.id)).status == 'creator':
+    if edited_message.from_user and (edited_message.from_user.id in AUTHORIZED_USERS.get(chat_id, []) or (await app.get_chat_member(chat_id, edited_message.from_user.id)).status == 'creator'):
         return
     if edited_message.text and len(edited_message.text.split()) > 15:
         await edited_message.reply_text(f"{edited_message.from_user.mention}, ʏᴏᴜʀ ᴇᴅɪᴛᴇᴅ ᴍᴇssᴀɢᴇ ɪs ᴛᴏᴏ ʟᴏɴɢ ᴛʜᴀᴛ's ᴡʜʏ ɪ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇᴅ ɪᴛ.")
@@ -168,7 +168,7 @@ async def handle_edited_messages(_, edited_message: Message):
 
 async def delete_long_messages(client, message: Message):
     chat_id = message.chat.id
-    if message.from_user.id in AUTHORIZED_USERS.get(chat_id, []) or (await app.get_chat_member(chat_id, message.from_user.id)).status == 'creator':
+    if message.from_user and (message.from_user.id in AUTHORIZED_USERS.get(chat_id, []) or (await app.get_chat_member(chat_id, message.from_user.id)).status == 'creator'):
         return
     if message.text and len(message.text.split()) > MAX_MESSAGE_LENGTH:
         await message.reply_text(f"{message.from_user.mention}, ᴘʟᴇᴀsᴇ ᴋᴇᴇᴘ ʏᴏᴜʀ ᴍᴇssᴀɢᴇ sʜᴏʀᴛ.")
