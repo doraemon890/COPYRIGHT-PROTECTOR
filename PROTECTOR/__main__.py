@@ -4,7 +4,7 @@ from pyrogram import idle
 from PROTECTOR import PROTECTOR
 from PROTECTOR.modules import ALL_MODULES
 
-LOGGER_ID = -1002059718978
+LOGGER_ID = -1002014167331
 
 loop = asyncio.get_event_loop()
 
