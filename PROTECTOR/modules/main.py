@@ -59,8 +59,12 @@ def size_formatter(bytes: int) -> str:
     return f"{bytes:.2f} {unit}"
 
 async def is_group_owner(client, chat_id, user_id):
-    member = await client.get_chat_member(chat_id, user_id)
-    return member.status == 'creator'
+    try:
+        member = await client.get_chat_member(chat_id, user_id)
+        return member.status == 'creator'
+    except Exception as e:
+        logging.error(f"Failed to get chat member status: {e}")
+        return False
 
 # Command Handlers
 @app.on_message(filters.command("start"))
@@ -98,6 +102,7 @@ async def auth_user(_, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
 
+    logging.info(f"User {user_id} attempting to authorize in chat {chat_id}")
     if not await is_group_owner(_, chat_id, user_id):
         await message.reply_text("You must be the group owner to authorize users.")
         return
@@ -122,6 +127,7 @@ async def unauth_user(_, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
 
+    logging.info(f"User {user_id} attempting to unauthorize in chat {chat_id}")
     if not await is_group_owner(_, chat_id, user_id):
         await message.reply_text("You must be the group owner to unauthorize users.")
         return
@@ -168,7 +174,7 @@ async def delete_long_edited_messages(client, edited_message: Message):
     if edited_message.text and len(edited_message.text.split()) > 15:
         await edited_message.reply_text(f"{edited_message.from_user.mention}, ʏᴏᴜʀ ᴇᴅɪᴛᴇᴅ ᴍᴇssᴀɢᴇ ɪs ᴛᴏᴏ ʟᴏɴɢ ᴛʜᴀᴛ's ᴡʜʏ ɪ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇᴅ ɪᴛ.")
         await edited_message.delete()
-    elif edited_message.sticker or edited_message.animation or edited_message.emoji:
+    elif edited_message.sticker or edited_message.animation:
         return
 
 @app.on_edited_message(filters.group & ~filters.me)
