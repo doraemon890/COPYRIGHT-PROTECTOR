@@ -28,7 +28,7 @@ def load_authorized_users():
     if os.path.exists(AUTHORIZED_USERS_FILE):
         with open(AUTHORIZED_USERS_FILE, "r") as f:
             return json.load(f)
-    return [OWNER_ID]
+    return {}
 
 # Save authorized users to file
 def save_authorized_users(users):
@@ -82,42 +82,61 @@ async def activevc(_, message: Message):
     )
     await message.reply(reply_text, quote=True)
 
-@app.on_message(filters.command("auth") & filters.user(OWNER_ID))
+@app.on_message(filters.command("auth") & filters.group)
 async def auth_user(_, message: Message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
+
+    if not (await app.get_chat_member(chat_id, user_id)).status == 'creator':
+        await message.reply_text("You must be the group owner to authorize users.")
+        return
+
     if len(message.command) != 2:
         await message.reply_text("Usage: /auth <user_id>")
         return
 
-    user_id = int(message.command[1])
-    if user_id not in AUTHORIZED_USERS:
-        AUTHORIZED_USERS.append(user_id)
-        save_authorized_users(AUTHORIZED_USERS)
-        await message.reply_text(f"User {user_id} has been authorized.")
-    else:
-        await message.reply_text(f"User {user_id} is already authorized.")
+    auth_user_id = int(message.command[1])
+    if chat_id not in AUTHORIZED_USERS:
+        AUTHORIZED_USERS[chat_id] = []
 
-@app.on_message(filters.command("unauth") & filters.user(OWNER_ID))
+    if auth_user_id not in AUTHORIZED_USERS[chat_id]:
+        AUTHORIZED_USERS[chat_id].append(auth_user_id)
+        save_authorized_users(AUTHORIZED_USERS)
+        await message.reply_text(f"User {auth_user_id} has been authorized for this group.")
+    else:
+        await message.reply_text(f"User {auth_user_id} is already authorized for this group.")
+
+@app.on_message(filters.command("unauth") & filters.group)
 async def unauth_user(_, message: Message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
+
+    if not (await app.get_chat_member(chat_id, user_id)).status == 'creator':
+        await message.reply_text("You must be the group owner to unauthorize users.")
+        return
+
     if len(message.command) != 2:
         await message.reply_text("Usage: /unauth <user_id>")
         return
 
-    user_id = int(message.command[1])
-    if user_id in AUTHORIZED_USERS:
-        AUTHORIZED_USERS.remove(user_id)
+    unauth_user_id = int(message.command[1])
+    if chat_id in AUTHORIZED_USERS and unauth_user_id in AUTHORIZED_USERS[chat_id]:
+        AUTHORIZED_USERS[chat_id].remove(unauth_user_id)
         save_authorized_users(AUTHORIZED_USERS)
-        await message.reply_text(f"User {user_id} has been unauthorized.")
+        await message.reply_text(f"User {unauth_user_id} has been unauthorized for this group.")
     else:
-        await message.reply_text(f"User {user_id} is not authorized.")
+        await message.reply_text(f"User {unauth_user_id} is not authorized for this group.")
 
-@app.on_message(filters.command("listauth") & filters.user(OWNER_ID))
+@app.on_message(filters.command("listauth") & filters.group)
 async def list_authorized_users(_, message: Message):
-    if not AUTHORIZED_USERS:
-        await message.reply_text("No users are currently authorized.")
+    chat_id = message.chat.id
+
+    if chat_id not in AUTHORIZED_USERS or not AUTHORIZED_USERS[chat_id]:
+        await message.reply_text("No users are currently authorized for this group.")
         return
 
-    authorized_users = "\n".join(map(str, AUTHORIZED_USERS))
-    await message.reply_text(f"Authorized users:\n{authorized_users}")
+    authorized_users = "\n".join(map(str, AUTHORIZED_USERS[chat_id]))
+    await message.reply_text(f"Authorized users for this group:\n{authorized_users}")
 
 # Callback Query Handlers
 @app.on_callback_query(filters.regex("vip_back"))
@@ -132,10 +151,11 @@ async def back_to_start_callback_handler(_, query: CallbackQuery):
 
 # Message Handlers
 async def delete_long_edited_messages(client, edited_message: Message):
-    if edited_message.from_user.id in AUTHORIZED_USERS:
+    chat_id = edited_message.chat.id
+    if edited_message.from_user.id in AUTHORIZED_USERS.get(chat_id, []):
         return
     if edited_message.text and len(edited_message.text.split()) > 15:
-        await edited_message.reply_text(f"{edited_message.from_user.mention}, ʏᴏᴜʀ ᴇᴅɪᴛᴇᴅ ᴍᴇssᴀɢᴇ ɪs ᴛᴏᴏ ʟᴏɴɢ ᴛʜᴀᴛ's ᴡʜʏ ɪ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇᴅ ɪᴛ.")
+        await edited_message.reply_text(f"{edited_message.from_user.mention},ʏᴏᴜʀ ᴇᴅɪᴛᴇᴅ ᴍᴇssᴀɢᴇ ɪs ᴛᴏᴏ ʟᴏɴɢ ᴛʜᴀᴛ's ᴡʜʏ ɪ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇᴅ ɪᴛ.")
         await edited_message.delete()
     elif edited_message.sticker or edited_message.animation or edited_message.emoji:
         return
@@ -145,7 +165,8 @@ async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
 
 async def delete_long_messages(client, message: Message):
-    if message.from_user.id in AUTHORIZED_USERS:
+    chat_id = message.chat.id
+    if message.from_user.id in AUTHORIZED_USERS.get(chat_id, []):
         return
     if message.text and len(message.text.split()) > MAX_MESSAGE_LENGTH:
         await message.reply_text(f"{message.from_user.mention}, ᴘʟᴇᴀsᴇ ᴋᴇᴇᴘ ʏᴏᴜʀ ᴍᴇssᴀɢᴇ sʜᴏʀᴛ.")
