@@ -135,6 +135,7 @@ async def delete_long_edited_messages(client, edited_message: Message):
     if edited_message.from_user.id in AUTHORIZED_USERS:
         return
     if edited_message.text and len(edited_message.text.split()) > 15:
+        await edited_message.reply_text(f"{edited_message.from_user.mention}, ʏᴏᴜʀ ᴇᴅɪᴛᴇᴅ ᴍᴇssᴀɢᴇ ɪs ᴛᴏᴏ ʟᴏɴɢ ᴛʜᴀᴛ's ᴡʜʏ ɪ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇᴅ ɪᴛ.")
         await edited_message.delete()
     elif edited_message.sticker or edited_message.animation or edited_message.emoji:
         return
@@ -147,7 +148,7 @@ async def delete_long_messages(client, message: Message):
     if message.from_user.id in AUTHORIZED_USERS:
         return
     if message.text and len(message.text.split()) > MAX_MESSAGE_LENGTH:
-        await message.reply_text("Please keep your message short.")
+        await message.reply_text(f"{message.from_user.mention}, ᴘʟᴇᴀsᴇ ᴋᴇᴇᴘ ʏᴏᴜʀ ᴍᴇssᴀɢᴇ sʜᴏʀᴛ.")
         await message.delete()
 
 @app.on_message(filters.group & ~filters.me)
