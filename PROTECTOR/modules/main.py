@@ -44,6 +44,9 @@ def save_authorized_users(users):
 
 AUTHORIZED_USERS = load_authorized_users()
 
+# Bot Functionality
+start_time = time.time()
+
 # Utility functions
 def time_formatter(milliseconds: float) -> str:
     seconds, milliseconds = divmod(milliseconds, 1000)
@@ -141,7 +144,7 @@ async def back_to_start_callback_handler(_, query: CallbackQuery):
 async def delete_long_edited_messages(client, edited_message: Message):
     if edited_message.from_user.id in AUTHORIZED_USERS:
         return
-    if edited_message.text and len(edited_message.text.split()) > 15:
+    if edited_message.text and len(edited_message.text.split()) > 20:
         await edited_message.reply_text(f"{edited_message.from_user.mention}, ʏᴏᴜʀ ᴇᴅɪᴛᴇᴅ ᴍᴇssᴀɢᴇ ɪs ᴛᴏᴏ ʟᴏɴɢ ᴛʜᴀᴛ's ᴡʜʏ ɪ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇᴅ ɪᴛ.")
         await edited_message.delete()
     elif edited_message.sticker or edited_message.animation or edited_message.emoji:
