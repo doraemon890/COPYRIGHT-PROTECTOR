@@ -1,5 +1,6 @@
 motor
 apscheduler
+emoji
 psutil
 pymongo
 pyrogram==2.0.106
