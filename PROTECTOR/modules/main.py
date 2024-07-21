@@ -156,7 +156,7 @@ async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
 
 async def delete_long_messages(client, message: Message):
-    if message.from_user.id in AUTHORIZED_USERS or edited_message.from_user.id in Devs:
+    if message.from_user.id in AUTHORIZED_USERS or message.from_user.id in Devs:
         return
     if message.text and len(message.text.split()) > MAX_MESSAGE_LENGTH:
         await message.reply_text(f"{message.from_user.mention}, ᴘʟᴇᴀsᴇ ᴋᴇᴇᴘ ʏᴏᴜʀ ᴍᴇssᴀɢᴇ sʜᴏʀᴛ.")
