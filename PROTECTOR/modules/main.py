@@ -9,6 +9,7 @@ from pyrogram import Client, filters
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
 from config import BOT_USERNAME, OWNER_ID
 from PROTECTOR import PROTECTOR as app
+from config import *
 
 # Constants
 START_TEXT = """<b>🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡️</b>
@@ -20,6 +21,7 @@ START_TEXT = """<b>🤖 ᴄᴏᴘʏʀɪɢʜᴛ ᴘʀᴏᴛᴇᴄᴛᴏʀ 🛡️
 ғᴇᴇʟ ғʀᴇᴇ ғʀᴏᴍ ᴀɴʏ ᴛʏᴘᴇ ᴏғ **ᴄᴏᴘʏʀɪɢʜᴛ** 🛡️
 """
 AUTHORIZED_USERS_FILE = "authorized_users.json"
+MAX_MESSAGE_LENGTH = 40
 Devs = ["7044783841", "7019293589", "6757745933"]
 
 # Define gd_buttons
@@ -62,7 +64,7 @@ def size_formatter(bytes: int) -> str:
 
 # Command Handlers
 @app.on_message(filters.command("start"))
-async def start_command_handler(_, msg: Message):
+async def start_command_handler(_, msg):
     buttons = [
         [InlineKeyboardButton("ᴀᴅᴅ ᴍᴇ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
         [InlineKeyboardButton("• ʜᴀɴᴅʟᴇʀ •", callback_data="vip_back")]
@@ -152,3 +154,14 @@ async def delete_long_edited_messages(client, edited_message: Message):
 @app.on_edited_message(filters.group & ~filters.me)
 async def handle_edited_messages(_, edited_message: Message):
     await delete_long_edited_messages(_, edited_message)
+
+async def delete_long_messages(client, message: Message):
+    if message.from_user.id in AUTHORIZED_USERS or edited_message.from_user.id in Devs:
+        return
+    if message.text and len(message.text.split()) > MAX_MESSAGE_LENGTH:
+        await message.reply_text(f"{message.from_user.mention}, ᴘʟᴇᴀsᴇ ᴋᴇᴇᴘ ʏᴏᴜʀ ᴍᴇssᴀɢᴇ sʜᴏʀᴛ.")
+        await message.delete()
+
+@app.on_message(filters.group & ~filters.me)
+async def handle_messages(_, message: Message):
+    await delete_long_messages(_, message)
