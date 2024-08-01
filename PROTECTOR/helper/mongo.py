@@ -1,6 +1,6 @@
 import sys
 
-from config import *
+from config import MONGO_URL
 from motor.motor_asyncio import AsyncIOMotorClient
 
 # Mongo Database
