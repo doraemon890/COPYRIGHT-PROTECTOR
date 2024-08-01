@@ -1,12 +1,10 @@
 from pyrogram import filters
-
+from config import SUDOERS 
 from PROTECTOR import PROTECTOR as app
 from PROTECTOR.helper.mongo import get_served_chats
 from PROTECTOR.helper.mongo import get_served_users
 
 IS_BROADCASTING = False
-SUDOERS = config.SUDOERS
-
 
 @app.on_message(filters.command(["broadcast", "gcast", "bcast"]) & SUDOERS)
 async def braodcast_message(client, message):
