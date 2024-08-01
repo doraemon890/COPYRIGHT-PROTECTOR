@@ -7,7 +7,7 @@ from PROTECTOR.helper.mongo import get_served_users
 IS_BROADCASTING = False
 
 @app.on_message(filters.command(["broadcast", "gcast", "bcast"]) & SUDOERS)
-async def braodcast_message(client, message):
+async def broadcast_message(client, message):
     global IS_BROADCASTING
     if message.reply_to_message:
         x = message.reply_to_message.message_id
@@ -16,14 +16,7 @@ async def braodcast_message(client, message):
         if len(message.command) < 2:
             return await message.reply_text("**Usage**:\n/broadcast [MESSAGE] or [Reply to a Message]")
         query = message.text.split(None, 1)[1]
-        if "-pin" in query:
-            query = query.replace("-pin", "")
-        if "-nobot" in query:
-            query = query.replace("-nobot", "")
-        if "-pinloud" in query:
-            query = query.replace("-pinloud", "")
-        if "-user" in query:
-            query = query.replace("-user", "")
+        query = query.replace("-pin", "").replace("-nobot", "").replace("-pinloud", "").replace("-user", "")
         if query == "":
             return await message.reply_text("Please provide some text to broadcast.")
 
@@ -41,11 +34,11 @@ async def braodcast_message(client, message):
             if i == -1002059718978:
                 continue
             try:
-                m = (
-                    await app.forward_messages(i, y, x)
-                    if message.reply_to_message
-                    else await app.send_message(i, text=query)
-                )
+                if message.reply_to_message:
+                    m = await app.forward_messages(i, y, x)
+                else:
+                    m = await app.send_message(i, text=query)
+
                 if "-pin" in message.text:
                     try:
                         await m.pin(disable_notification=True)
@@ -67,7 +60,7 @@ async def braodcast_message(client, message):
             except Exception:
                 continue
         try:
-            await message.reply_text("**Broadcasted Message In {0}  Chats with {1} Pins from Bot.**".format(sent, pin))
+            await message.reply_text(f"**Broadcasted Message In {sent} Chats with {pin} Pins from Bot.**")
         except:
             pass
 
@@ -80,11 +73,10 @@ async def braodcast_message(client, message):
             served_users.append(int(user["user_id"]))
         for i in served_users:
             try:
-                m = (
-                    await app.forward_messages(i, y, x)
-                    if message.reply_to_message
-                    else await app.send_message(i, text=query)
-                )
+                if message.reply_to_message:
+                    m = await app.forward_messages(i, y, x)
+                else:
+                    m = await app.send_message(i, text=query)
                 susr += 1
             except FloodWait as e:
                 flood_time = int(e.x)
@@ -94,7 +86,7 @@ async def braodcast_message(client, message):
             except Exception:
                 pass
         try:
-            await message.reply_text("**Broadcasted Message to {0} Users.**".format(susr))
+            await message.reply_text(f"**Broadcasted Message to {susr} Users.**")
         except:
             pass
     IS_BROADCASTING = False
