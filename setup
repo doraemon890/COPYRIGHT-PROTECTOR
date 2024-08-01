@@ -1,0 +1,124 @@
+#!/bin/bash
+
+pprint (){
+	cred='\033[0;31m'
+	cgreen='\033[0;32m'
+	cyellow='\033[0;33m'
+	cblue='\033[0;34m'
+	cpurple='\033[0;35m'
+	eval "export color='$cpurple'"
+	[ ! -z $2 ] && eval "export color=\"\$$2\""
+    printf "$color $1"
+}
+
+color_reset(){ printf '\033[0;37m';}
+
+yesnoprompt(){
+	old_stty_cfg=$(stty -g)
+	stty raw -echo ; answer=$(head -c 1)
+	stty $old_stty_cfg
+	echo "$answer" | grep -iq "^y"
+}
+
+update() {
+	pprint "\n\nUpdating package list.. "
+	sudo apt update 2>&1 | grep "can be upgraded" &>/dev/null
+	if [ $? -eq 0 ]; then
+		pprint "UPDATE AVAILABLE" "cgreen"
+		pprint "\n\nDo you want to automatically upgrade (y/n)?"
+		if yesnoprompt; then
+			pprint "\n\nUpgrading packages.. "
+			sudo apt upgrade -y &>/dev/null &&
+			pprint "DONE!\n\n" "cgreen" || (pprint "FAIL.\n\n" "cred"; exit 1)
+		else
+			echo
+		fi
+	else
+		pprint "ALREADY UP TO DATE\n\n" "cgreen"
+	fi
+}
+
+packages(){
+	if ! command -v pip &>/dev/null; then
+		pprint "Couldn't find pip, installing now..."
+		sudo apt install python3-pip -y 2>pypilog.txt 1>/dev/null &&
+		pprint "SUCCESS.\n\n" "cgreen" || (pprint "FAIL.\n\n" "cred"; exit 1)
+	fi
+
+	if ! command -v ffmpeg &>/dev/null; then
+		pprint "Couldn't find ffmpeg, installing now..."
+		if sudo apt install ffmpeg -y &>/dev/null; then
+			pprint "SUCCESS.\n\n" "cgreen"
+		else
+			pprint "FAIL.\n\n" "cred"
+			pprint "You need to install ffmpeg manually in order to deploy Ava, exiting...\n" "cblue"
+			exit 1
+		fi
+	fi
+
+	# Check ffmpeg version and warn user if necessary.
+	fv=$(grep -Po 'version (3.*?) ' <<< $(ffmpeg -version)) &&
+	pprint "Playing live streams is not supported since you have ffmpeg $fv, live streams are supported by version 4+.\n" "cblue"
+}
+
+node(){
+	command -v npm &>/dev/null && return
+	pprint "Installing Nodejs and Npm..  "
+	curl -fssL https://deb.nodesource.com/setup_19.x | sudo -E bash - &>nodelog.txt &&
+	sudo apt install -y nodejs &>>nodelog.txt &&
+	sudo npm i -g npm &>>nodelog.txt &&
+	pprint "SUCCESS!\n" "cgreen" || (pprint "FAIL.\n" "cred"; exit 1)
+}
+
+installation(){
+	pprint "\n\nUpgrading pip and installing dependency packages..."
+	pip3 install -U pip &>>pypilog.txt &&
+	pip3 install -U -r requirements.txt &>>pypilog.txt &&
+	pprint "DONE.\n" "cgreen" && return
+	pprint "FAIL.\n" "cred"
+	exit 1
+}
+
+clear
+pprint "Welcome to Ava Setup Installer\n\n"
+pprint "If you see any error during the installation process, please refer to these files for logs: "
+pprint "\nFor Node.js errors, check nodelog.txt"
+pprint "\nFor PyPI packages errors, check pypilog.txt"
+sleep 1
+pprint "\n\nThe script needs sudo privileges to update & install packages.\n"
+sudo test
+
+update
+packages
+node
+installation
+pprint "\n\n\n\n\nAva Installation Completed!" "cgreen"
+sleep 1
+clear
+
+pprint "\nEnter Your Values Below\n\n\n"
+pprint "API ID: "; color_reset; read api_id
+pprint "\nAPI HASH: "; color_reset; read api_hash
+pprint "\nBOT TOKEN: "; color_reset; read bot_token
+pprint "\nOWNER ID: "; color_reset; read owner_id
+pprint "\nMONGO DB URI: "; color_reset; read mongo_db_uri
+pprint "\nBOT USERNAME: "; color_reset; read bot_username
+pprint "\nLOGGER ID: "; color_reset; read logger_id
+
+pprint "\n\nProcessing your vars, please wait a moment!" "cgreen"
+
+if [ -f .env ]; then
+	rm .env
+fi
+
+echo """API_ID=$api_id
+API_HASH=$api_hash
+BOT_TOKEN=$bot_token
+OWNER_ID=$owner_id
+MONGO_DB_URI=$mongo_db_uri
+BOT_USERNAME=$bot_username
+LOGGER_ID=$logger_id""" > .env
+clear
+
+pprint "\n\n\nThanks for using Ava installer, your vars have been saved successfully! \nIf you want to add more variables, add them in your env by editing the .env file."
+pprint "\n\nNow you can start the bot by running: python -m PROTECTOR\n\n"

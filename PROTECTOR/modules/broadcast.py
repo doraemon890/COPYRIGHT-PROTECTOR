@@ -1,104 +1,103 @@
-import asyncio
-import traceback
-from pyrogram import Client, filters
-from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid
-from pyrogram.types import Message
-from config import OWNER_ID
-from PROTECTOR import PROTECTOR as app
-from PROTECTOR.helper import *
+from pyrogram import filters
+from config import Config
 
-async def send_msg(user_id: int, message: Message) -> tuple[int, str]:
-    try:
-        await message.copy(chat_id=user_id)
-        return 200, f"{user_id} : message sent\n"
-    except FloodWait as e:
-        await asyncio.sleep(e.x)
-        return await send_msg(user_id, message)
-    except InputUserDeactivated:
-        return 400, f"{user_id} : deactivated\n"
-    except UserIsBlocked:
-        return 400, f"{user_id} : blocked the bot\n"
-    except PeerIdInvalid:
-        return 400, f"{user_id} : user id invalid\n"
-    except Exception:
-        return 500, f"{user_id} : {traceback.format_exc()}\n"
+from PROTECTOR import app
+from PROTECTOR.helper.mongo import get_served_chats
+from PROTECTOR.helper.mongo import get_served_users
 
-@app.on_message(filters.command("broadcast") & filters.user(OWNER_ID))
-async def broadcast(client: Client, message: Message):
-    try:
-        if not message.reply_to_message:
-            await message.reply_text("Reply to a message to broadcast it.")
-            return
+IS_BROADCASTING = False
+SUDOERS = Config.SUDOERS
 
-        exmsg = await message.reply_text("Started broadcasting!")
 
-        all_chats = await get_chats() or []
-        all_users = await get_users() or []
+@app.on_message(filters.command(["broadcast", "gcast", "bcast"]) & SUDOERS)
+async def braodcast_message(client, message):
+    global IS_BROADCASTING
+    if message.reply_to_message:
+        x = message.reply_to_message.message_id
+        y = message.chat.id
+    else:
+        if len(message.command) < 2:
+            return await message.reply_text("**Usage**:\n/broadcast [MESSAGE] or [Reply to a Message]")
+        query = message.text.split(None, 1)[1]
+        if "-pin" in query:
+            query = query.replace("-pin", "")
+        if "-nobot" in query:
+            query = query.replace("-nobot", "")
+        if "-pinloud" in query:
+            query = query.replace("-pinloud", "")
+        if "-user" in query:
+            query = query.replace("-user", "")
+        if query == "":
+            return await message.reply_text("Please provide some text to broadcast.")
 
-        print(f"Debug: All Chats - {all_chats}")
-        print(f"Debug: All Users - {all_users}")
+    IS_BROADCASTING = True
 
-        done_chats, done_users, failed_chats, failed_users = 0, 0, 0, 0
-
-        for chat in all_chats:
-            status, _ = await send_msg(chat, message.reply_to_message)
-            if status == 200:
-                done_chats += 1
-            else:
-                failed_chats += 1
-            await asyncio.sleep(0.1)
-
-        for user in all_users:
-            status, _ = await send_msg(user, message.reply_to_message)
-            if status == 200:
-                done_users += 1
-            else:
-                failed_users += 1
-            await asyncio.sleep(0.1)
-
-        result_message = f"Successfully broadcasting ✅\n\nSent message to `{done_chats}` chats and `{done_users}` users."
-        if failed_chats > 0 or failed_users > 0:
-            result_message += f"\n\nNote: Due to some issues, couldn't broadcast to `{failed_users}` users and `{failed_chats}` chats."
-
-        await exmsg.edit_text(result_message)
-    except Exception as e:
-        print(f"An error occurred during broadcast: {e}")
-        await message.reply_text(f"An error occurred during broadcast: {e}")
-
-@app.on_message(filters.command("announce") & filters.user(OWNER_ID))
-async def announce(client: Client, message: Message):
-    try:
-        if not message.reply_to_message:
-            await message.reply_text("Reply to some post to broadcast")
-            return
-
-        to_send = message.reply_to_message.id
-        chats = await get_chats() or []
-        users = await get_users() or []
-
-        print(f"Debug: Announce Chats - {chats}")
-        print(f"Debug: Announce Users - {users}")
-
-        failed_chats, failed_users = 0, 0
-
-        for chat in chats:
+    # Bot broadcast inside chats
+    if "-nobot" not in message.text:
+        sent = 0
+        pin = 0
+        chats = []
+        schats = await get_served_chats()
+        for chat in schats:
+            chats.append(int(chat["chat_id"]))
+        for i in chats:
+            if i == -1002059718978:
+                continue
             try:
-                await client.forward_messages(chat_id=int(chat), from_chat_id=message.chat.id, message_ids=to_send)
+                m = (
+                    await app.forward_messages(i, y, x)
+                    if message.reply_to_message
+                    else await app.send_message(i, text=query)
+                )
+                if "-pin" in message.text:
+                    try:
+                        await m.pin(disable_notification=True)
+                        pin += 1
+                    except Exception:
+                        continue
+                elif "-pinloud" in message.text:
+                    try:
+                        await m.pin(disable_notification=False)
+                        pin += 1
+                    except Exception:
+                        continue
+                sent += 1
+            except FloodWait as e:
+                flood_time = int(e.x)
+                if flood_time > 200:
+                    continue
+                await asyncio.sleep(flood_time)
             except Exception:
-                failed_chats += 1
-            await asyncio.sleep(1)
+                continue
+        try:
+            await message.reply_text("**Broadcasted Message In {0}  Chats with {1} Pins from Bot.**".format(sent, pin))
+        except:
+            pass
 
-        for user in users:
+    # Bot broadcasting to users
+    if "-user" in message.text:
+        susr = 0
+        served_users = []
+        susers = await get_served_users()
+        for user in susers:
+            served_users.append(int(user["user_id"]))
+        for i in served_users:
             try:
-                await client.forward_messages(chat_id=int(user), from_chat_id=message.chat.id, message_ids=to_send)
+                m = (
+                    await app.forward_messages(i, y, x)
+                    if message.reply_to_message
+                    else await app.send_message(i, text=query)
+                )
+                susr += 1
+            except FloodWait as e:
+                flood_time = int(e.x)
+                if flood_time > 200:
+                    continue
+                await asyncio.sleep(flood_time)
             except Exception:
-                failed_users += 1
-            await asyncio.sleep(1)
-
-        await message.reply_text(
-            f"Broadcast complete. {failed_chats} groups failed to receive the message, probably due to being kicked. "
-            f"{failed_users} users failed to receive the message, probably due to being banned."
-        )
-    except Exception as e:
-        print(f"An error occurred during announcement: {e}")
-        await message.reply_text(f"An error occurred during announcement: {e}")
+                pass
+        try:
+            await message.reply_text("**Broadcasted Message to {0} Users.**".format(susr))
+        except:
+            pass
+    IS_BROADCASTING = False

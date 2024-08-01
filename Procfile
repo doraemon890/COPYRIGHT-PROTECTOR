@@ -1,1 +1,1 @@
-JARVIS: python -m PROTECTOR
+worker: python -m PROTECTOR
