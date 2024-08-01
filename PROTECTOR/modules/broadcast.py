@@ -1,5 +1,5 @@
 from pyrogram import filters
-from config import import *
+from config import *
 
 from PROTECTOR import app
 from PROTECTOR.helper.mongo import get_served_chats
