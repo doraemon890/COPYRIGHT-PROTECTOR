@@ -6,7 +6,7 @@ from PROTECTOR.helper.mongo import get_served_chats
 from PROTECTOR.helper.mongo import get_served_users
 
 IS_BROADCASTING = False
-SUDOERS = Config.SUDOERS
+SUDOERS = config.SUDOERS
 
 
 @app.on_message(filters.command(["broadcast", "gcast", "bcast"]) & SUDOERS)
