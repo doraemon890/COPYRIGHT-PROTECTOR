@@ -1,5 +1,6 @@
 from pyrogram import filters
-from config import SUDOERS 
+from pyrogram.errors import FloodWait
+from config import SUDOERS
 from PROTECTOR import PROTECTOR as app
 from PROTECTOR.helper.mongo import get_served_chats
 from PROTECTOR.helper.mongo import get_served_users
@@ -9,7 +10,9 @@ IS_BROADCASTING = False
 @app.on_message(filters.command(["broadcast", "gcast", "bcast"]) & SUDOERS)
 async def broadcast_message(client, message):
     global IS_BROADCASTING
-    if message.reply_to_message:
+
+    # Check if the message is a reply and extract the message_id if available
+    if message.reply_to_message and message.reply_to_message.message_id:
         x = message.reply_to_message.message_id
         y = message.chat.id
     else:
@@ -34,7 +37,7 @@ async def broadcast_message(client, message):
             if i == -1002059718978:
                 continue
             try:
-                if message.reply_to_message:
+                if message.reply_to_message and message.reply_to_message.message_id:
                     m = await app.forward_messages(i, y, x)
                 else:
                     m = await app.send_message(i, text=query)
@@ -73,7 +76,7 @@ async def broadcast_message(client, message):
             served_users.append(int(user["user_id"]))
         for i in served_users:
             try:
-                if message.reply_to_message:
+                if message.reply_to_message and message.reply_to_message.message_id:
                     m = await app.forward_messages(i, y, x)
                 else:
                     m = await app.send_message(i, text=query)
@@ -89,4 +92,5 @@ async def broadcast_message(client, message):
             await message.reply_text(f"**Broadcasted Message to {susr} Users.**")
         except:
             pass
+
     IS_BROADCASTING = False
